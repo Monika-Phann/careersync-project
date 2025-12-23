@@ -1,0 +1,21 @@
+{
+  "name": "careersync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "concurrently \"cd careersync-user && npm install\" \"cd careersync-mentor && npm install\" \"cd careersync-server && npm install\" \"cd edu && npm install\" \"cd educationanb && npm install\"",
+    "dev": "concurrently -n \"USER,MENTOR,SRV,EDU,ANB\" -c \"blue,green,magenta,cyan,yellow\" \"cd careersync-user && npm run dev\" \"cd careersync-mentor && npm run dev\" \"cd careersync-server && npm run dev\" \"cd edu && npm run dev\" \"cd educationanb && npm run dev\""
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  }
+}
