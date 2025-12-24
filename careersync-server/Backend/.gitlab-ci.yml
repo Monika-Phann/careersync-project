@@ -1,0 +1,64 @@
+# =========================
+# CareerSync Backend CI/CD
+# =========================
+
+image: node:18
+
+stages:
+  - install
+  - verify
+  - build
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - Backend/node_modules/
+
+# -------------------------
+# Stage 1: Install
+# -------------------------
+install_dependencies:
+  stage: install
+  script:
+    - echo "Installing dependencies"
+    - cd Backend
+    - node -v
+    - npm -v
+    - npm install
+  artifacts:
+    paths:
+      - Backend/node_modules/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# -------------------------
+# Stage 2: Verify
+# -------------------------
+verify_backend:
+  stage: verify
+  script:
+    - echo "Verifying backend structure"
+    - cd Backend
+    - test -f package.json
+    - test -d src
+    - test -d src/models
+    - test -d src/controllers
+    - test -d src/routes
+    - echo "✔ Backend structure OK"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# -------------------------
+# Stage 3: Build (Smoke Check)
+# -------------------------
+build_backend:
+  stage: build
+  script:
+    - echo "Backend build check"
+    - cd Backend
+    - echo "Backend ready for deployment"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+    - if: '$CI_COMMIT_BRANCH == "main"'

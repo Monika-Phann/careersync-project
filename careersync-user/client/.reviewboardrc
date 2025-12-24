@@ -1,0 +1,5 @@
+REVIEWBOARD_URL = "review.clp.kr"
+REPOSITORY = "4BE/CareerSync/User"
+REPOSITORY_TYPE = "git"
+BRANCH = "feature/student-auth"
+LAND_DEST_BRANCH = "feature/student-auth"

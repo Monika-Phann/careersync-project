@@ -1,0 +1,33 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - adminServer  # ⚠️ សំខាន់: ពិនិត្យមើលថា Branch បងឈ្មោះ main ឬ master?
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          # ចូលទៅកាន់ Folder Backend
+          cd /var/www/careersync/backend
+          
+          # ទាញយកកូដថ្មី
+          git pull origin main # ឬ master តាមឈ្មោះ branch បង
+          
+          # ដំឡើង Library និង Restart Server
+          npm install
+          pm2 restart all --update-env
+          
+          echo "🚀 Backend Deployed Successfully!"

@@ -1,0 +1,40 @@
+warning: in the working copy of 'client/src/pages/Settings/Settings.jsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/client/src/pages/Settings/Settings.jsx b/client/src/pages/Settings/Settings.jsx[m
+[1mindex 482ff7a..5582fca 100644[m
+[1m--- a/client/src/pages/Settings/Settings.jsx[m
+[1m+++ b/client/src/pages/Settings/Settings.jsx[m
+[36m@@ -21,8 +21,6 @@[m [mimport {[m
+   CameraAlt as CameraIcon,[m
+   Visibility,[m
+   VisibilityOff,[m
+[31m-  LockOutlined as LockOutlinedIcon,[m
+[31m-  Key as KeyIcon,[m
+   CloudUpload as CloudUploadIcon,[m
+ } from '@mui/icons-material'[m
+ import SettingsTabSwitcher from '../../components/Settings/SettingsTabSwitcher'[m
+[36m@@ -330,7 +328,11 @@[m [mfunction Settings() {[m
+           {activeTab === 'security' && ([m
+             <Box>[m
+               <Box sx={SettingsStyles.securityHeader}>[m
+[31m-                <LockOutlinedIcon sx={SettingsStyles.securityIcon} />[m
+[32m+[m[32m                <img[m[41m [m
+[32m+[m[32m                  src="/security-setting.svg"[m[41m [m
+[32m+[m[32m                  alt="Security Settings"[m[41m [m
+[32m+[m[32m                  style={{ width: '48px', height: '48px', marginTop: '4px' }}[m
+[32m+[m[32m                />[m
+                 <Box>[m
+                   <Typography variant="h6" sx={SettingsStyles.sectionTitle}>[m
+                     Security Settings[m
+[36m@@ -343,7 +345,11 @@[m [mfunction Settings() {[m
+ [m
+               <Box sx={SettingsStyles.passwordSection}>[m
+                 <Box sx={SettingsStyles.passwordSectionHeader}>[m
+[31m-                  <KeyIcon sx={SettingsStyles.keyIcon} />[m
+[32m+[m[32m                  <img[m[41m [m
+[32m+[m[32m                    src="/change-password.svg"[m[41m [m
+[32m+[m[32m                    alt="Change Password"[m[41m [m
+[32m+[m[32m                    style={{ width: '24px', height: '24px' }}[m
+[32m+[m[32m                  />[m
+                   <Typography variant="h6" sx={SettingsStyles.passwordTitle}>[m
+                     Change Password[m
+                   </Typography>[m
