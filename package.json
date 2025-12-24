@@ -3,15 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "clean": "taskkill /f /im node.exe || exit 0",
-    "install-all": "npm install && concurrently \"cd careersync-user && npm install\" \"cd careersync-mentor && npm install\" \"cd careersync-server/Backend && npm install\" \"cd edu && npm install\" \"cd educationanb && npm install\"",
-    "server": "node super-server.js",
-    "dev": "npm run clean && concurrently -n \"SERVER,USER,MENTOR,ANB\" -c \"magenta,blue,green,yellow\" \"node super-server.js\" \"cd careersync-user && npm run dev\" \"cd careersync-mentor && npm run dev\" \"cd educationanb && npm run dev\""
+  "clean": "taskkill /f /im node.exe || exit 0",
+  "server": "node super-server.js",
+  "dev": "concurrently -n \"USER,MENTOR,ANB\" -c \"blue,green,yellow\" \"cd careersync-user && npm run dev\" \"cd careersync-mentor && npm run dev\" \"cd educationanb && npm run dev\""
 },
   "author": "",
   "license": "ISC",
-  "keywords": [],
-  "description": "",
   "devDependencies": {
     "concurrently": "^9.2.1"
   },
