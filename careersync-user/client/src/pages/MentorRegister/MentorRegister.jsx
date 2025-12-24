@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import axios from 'axios' // ✅ Added
-import { useNavigate } from 'react-router-dom' // ✅ Added
+import axios from 'axios' 
+import { useNavigate } from 'react-router-dom' 
 import { 
   Box, Typography, RadioGroup, FormControlLabel, Radio, Checkbox, 
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert // ✅ Added UI components
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert,
+  CircularProgress // ✅ Added for the loading spinner
 } from '@mui/material'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline' // ✅ Added Icon
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline' 
 import Button from '../../components/UI/Button/Button'
 import FormInput from '../../components/UI/FormInput/FormInput'
 import { motion } from 'framer-motion'
@@ -26,13 +27,13 @@ import termsMd from "../../components/content/MentorTerms.md?raw";
 import privacyMd from "../../components/content/MentorPrivacy.md?raw";
 
 function MentorRegister() {
-  const navigate = useNavigate() // ✅ Added hook
+  const navigate = useNavigate()
   const [legalOpen, setLegalOpen] = useState(null)
   const [profilePreview, setProfilePreview] = useState(null)
   
-  // ✅ Added States for Popup & API Errors
   const [openSuccess, setOpenSuccess] = useState(false)
   const [serverError, setServerError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Added state
 
   const [formData, setFormData] = useState({
     profilePicture: null,
@@ -60,7 +61,6 @@ function MentorRegister() {
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
 
-  // ... (Keep existing validation functions: validateEmail, validatePassword, etc.) ...
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
@@ -209,12 +209,12 @@ function MentorRegister() {
     validateField('profilePicture', file)
   }
 
-  // ✅ Updated Submit Logic
+  // ✅ Updated Submit Logic with FormData and Loading State
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setServerError('') // Clear previous errors
+    setServerError('')
 
-    // Mark all required fields as touched
+    // Trigger validation UI for all fields
     const requiredFields = [
       'profilePicture', 'email', 'password', 'confirmPassword',
       'firstName', 'lastName', 'phone', 'dateOfBirth',
@@ -222,57 +222,41 @@ function MentorRegister() {
       'yearsOfExperience', 'cvLink', 'termsAccepted',
     ]
     const newTouched = {}
-    requiredFields.forEach((field) => {
-      newTouched[field] = true
-    })
+    requiredFields.forEach((field) => { newTouched[field] = true })
     setTouched(newTouched)
 
-    // Validate
-    const newErrors = {}
-    if (!formData.profilePicture) newErrors.profilePicture = 'Profile picture is required'
-    if (!formData.email) {
-      newErrors.email = 'Email is required'
-    } else if (!validateEmail(formData.email)) newErrors.email = 'Please enter a valid email address'
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required'
-    } else if (!validatePassword(formData.password)) newErrors.password = 'Password weak'
-    
-    if (formData.confirmPassword !== formData.password) newErrors.confirmPassword = 'Passwords do not match'
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required'
-    if (!formData.phone) newErrors.phone = 'Phone required'
-    if (!formData.industry.trim()) newErrors.industry = 'Industry required'
-    if (!formData.position.trim()) newErrors.position = 'Position required'
-    if (!formData.termsAccepted) newErrors.termsAccepted = 'Must accept terms'
-    // ... (Keep the rest of your specific field validations if needed)
-
-    setErrors(newErrors)
-
-    if (Object.keys(newErrors).length === 0) {
+    // Final check for errors before sending
+    if (Object.keys(errors).length === 0 && formData.termsAccepted && formData.profilePicture) {
+      setIsSubmitting(true); // Start loading
+      
       try {
-        // ✅ Send to Backend
-        // Note: Sending 'formData' object directly sends JSON. 
-        // If your backend handles images later, you will need to switch to 'new FormData()'
-        const response = await axios.post('http://localhost:8081/api/v1/auth/register-mentor', formData);
+        // ✅ Use FormData to correctly send the Image File
+        const data = new FormData();
+        Object.keys(formData).forEach(key => {
+          data.append(key, formData[key]);
+        });
 
-        if (response.status === 201) {
-            setOpenSuccess(true); // Open the success dialog
+        const response = await axios.post('http://localhost:8081/api/v1/auth/register-mentor', data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        if (response.status === 201 || response.status === 200) {
+            setOpenSuccess(true);
         }
       } catch (err) {
-        console.error("Registration Error:", err);
         setServerError(err.response?.data?.message || 'Registration failed. Please try again.');
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to see error
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } finally {
+        setIsSubmitting(false); // Stop loading
       }
     } else {
-        // If local validation fails, scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   const handleCloseSuccess = () => {
     setOpenSuccess(false);
-    navigate('/'); // Redirect to Home
+    navigate('/'); 
   };
 
   return (
@@ -284,7 +268,6 @@ function MentorRegister() {
     >
       <form onSubmit={handleSubmit}>
         <Layout>
-          {/* ✅ Server Error Alert */}
           {serverError && (
              <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
                {serverError}
@@ -310,7 +293,7 @@ function MentorRegister() {
                   border: touched.profilePicture && errors.profilePicture ? '2px solid #ef4444' : '1px solid #d5d7db',
                 }}
               >
-                {!formData.profilePicture && '👤'}
+                {!profilePreview && '👤'}
               </ProfileCircle>
               <input
                 id="mentor-profile-upload"
@@ -600,8 +583,9 @@ function MentorRegister() {
                 </Typography>
               )}
 
-              <Button full variant="secondary" type="submit">
-                Submit Mentor Application
+              {/* ✅ Button now shows a spinner while loading */}
+              <Button full variant="secondary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Mentor Application'}
               </Button>
             </FormCard>
 
@@ -622,28 +606,25 @@ function MentorRegister() {
         </Layout>
       </form>
 
-      {/* ✅ Success Popup Dialog */}
       <Dialog
         open={openSuccess}
         onClose={handleCloseSuccess}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
         disableScrollLock
       >
         <Box sx={{ textAlign: 'center', p: 3, minWidth: '300px' }}>
             <CheckCircleOutlineIcon sx={{ fontSize: 60, color: 'green', mb: 2 }} />
-            <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 'bold' }}>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>
               Application Submitted!
             </DialogTitle>
             <DialogContent>
-            <DialogContentText id="alert-dialog-description">
+            <DialogContentText>
                 Your request has been sent to the admin successfully. 
                 <br /><br />
                 Please wait for approval. You will be notified once your account is active.
             </DialogContentText>
             </DialogContent>
             <DialogActions sx={{ justifyContent: 'center' }}>
-            <Button onClick={handleCloseSuccess} autoFocus>
+            <Button onClick={handleCloseSuccess}>
                 Return Home
             </Button>
             </DialogActions>
@@ -653,4 +634,4 @@ function MentorRegister() {
   )
 }
 
-export default MentorRegister
+export default MentorRegister;

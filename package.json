@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "clean": "taskkill /f /im node.exe || exit 0",
-  "server": "node super-server.js",
-  "dev": "concurrently -n \"USER,MENTOR,ANB\" -c \"blue,green,yellow\" \"cd careersync-user && npm run dev\" \"cd careersync-mentor && npm run dev\" \"cd educationanb && npm run dev\""
-},
+    "clean": "taskkill /f /im node.exe || exit 0",
+    "server": "node super-server.js",
+    "dev": "concurrently -n \"USER,MENTOR,ANB\" -c \"blue,green,yellow\" \"cd careersync-user && npm run dev\" \"cd careersync-mentor && npm run dev\" \"cd educationanb && npm run dev\""
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -15,6 +15,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "multer": "^2.0.2"
   }
 }
